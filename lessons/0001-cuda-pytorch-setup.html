@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 1: CUDA & PyTorch Setup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --success-color: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --warning-color: #f59e0b;
+            --code-bg: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+        }
+
+        h2 .number {
+            background-color: var(--accent-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--code-bg);
+            color: #f43f5e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #030712;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            position: relative;
+            margin: 16px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: #e5e7eb;
+            padding: 0;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .quiz-container {
+            background: rgba(16, 185, 129, 0.03);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .quiz-question {
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-color);
+        }
+
+        .quiz-option.correct {
+            background: var(--success-glow);
+            border-color: var(--success-color);
+        }
+
+        .quiz-option.wrong {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        .feedback-message {
+            margin-top: 16px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback-message.correct {
+            color: var(--success-color);
+        }
+
+        .feedback-message.wrong {
+            color: #f87171;
+        }
+
+        .success-box {
+            background: var(--success-glow);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-box svg {
+            color: var(--success-color);
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .nav-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="meta-badge">Lesson 1 &bull; 10 Minutes &bull; Skill-Building</span>
+            <h1>CUDA & PyTorch Environment Setup</h1>
+            <p class="subtitle">Initialize and verify GPU-accelerated computing on your Ubuntu RTX 4060 Ti workstation.</p>
+        </header>
+
+        <section class="section-card">
+            <h2><span class="number">1</span> Why Start Here?</h2>
+            <p>Fine-tuning Large Language Models (LLMs) requires millions of matrix multiplications per second. Doing this on a CPU is impossibly slow. To utilize your <strong>NVIDIA RTX 4060 Ti GPU</strong>, we must use <strong>CUDA</strong> (Compute Unified Device Architecture) via <strong>PyTorch</strong>.</p>
+            <p>Since your GPU has <strong>16 GB of VRAM</strong>, it is a fantastic driver for Parameter-Efficient Fine-Tuning (PEFT) models like Llama-3-8B using QLoRA. Let's make sure your Python environment is speaking to the GPU correctly.</p>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">2</span> Step 1: Verify System GPU Drivers</h2>
+            <p>Before installing Python libraries, check if your Ubuntu system recognizes the NVIDIA GPU and driver. Run this in your terminal:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-smi')">Copy</button><code id="cmd-smi">nvidia-smi</code></pre>
+            <p><strong>Expected Output:</strong> You should see a table detailing your GPU name (e.g., NVIDIA GeForce RTX 4060 Ti), total VRAM (around 16384 MiB), and the current CUDA Driver Version (e.g., 12.1, 12.2, etc.).</p>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">3</span> Step 2: Create a Clean Virtual Environment</h2>
+            <p>Using a Python virtual environment prevents package conflicts. Run the following commands in your shell:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-venv')">Copy</button><code id="cmd-venv"># Navigate to your workspace directory
+cd ~/Projetos/learning-fine-tuning
+
+# Create a virtual environment named 'venv'
+python3 -m venv venv
+
+# Activate the virtual environment
+source venv/bin/activate</code></pre>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">4</span> Step 3: Install PyTorch with CUDA 12.1</h2>
+            <p>By default, <code>pip install torch</code> may pull down a CPU-only build or a version mismatch. We will explicitly target CUDA 12.1 wheel indices to match modern GPUs:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-pip')">Copy</button><code id="cmd-pip">pip install --upgrade pip
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121</code></pre>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">5</span> Step 4: Run the Verification Script</h2>
+            <p>Create a verification script to query PyTorch. You can save this file as <code>verify_gpu.py</code> in your workspace root:</p>
+            <pre><button class="copy-btn" onclick="copyCode('code-verify')">Copy</button><code id="code-verify">import torch
+
+print("=== PyTorch GPU Verification ===")
+cuda_available = torch.cuda.is_available()
+print(f"CUDA Available: {cuda_available}")
+
+if cuda_available:
+    device_count = torch.cuda.device_count()
+    current_device = torch.cuda.current_device()
+    device_name = torch.cuda.get_device_name(current_device)
+    total_memory = torch.cuda.get_device_properties(current_device).total_memory
+    memory_gb = total_memory / (1024 ** 3)
+    
+    print(f"Device Count: {device_count}")
+    print(f"Current Device ID: {current_device}")
+    print(f"Device Name: {device_name}")
+    print(f"Total VRAM: {memory_gb:.2f} GB")
+    
+    # Run a quick tensor computation on the GPU
+    x = torch.rand(3, 3).cuda()
+    y = torch.rand(3, 3).cuda()
+    z = x @ y
+    print("Test Matrix Multiplication: Successful!")
+else:
+    print("❌ GPU not detected. PyTorch is running in CPU mode.")</code></pre>
+            <p>Execute the script inside your activated environment:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-run')">Copy</button><code id="cmd-run">python verify_gpu.py</code></pre>
+        </section>
+
+        <section class="section-card quiz-container" id="quiz">
+            <h2>Interactive Checkpoint</h2>
+            <div class="quiz-question">With 16 GB of VRAM on your RTX 4060 Ti, which of the following is the most efficient and practical method to fine-tune an 8-billion parameter (8B) model like Llama 3?</div>
+            <div class="quiz-options">
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'Full parameters requires ~160GB+ of VRAM just to store the gradients and optimizer states for an 8B model! Not possible on a 16GB GPU.')">
+                    A) Full Parameter Fine-Tuning in FP32
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true, 'Correct! QLoRA loads the model in 4-bit quantization and adds tiny trainable adapter layers, allowing an 8B model to be fine-tuned using ~8-12 GB of VRAM.')">
+                    B) QLoRA (Quantized Low-Rank Adaptation)
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'While CPU offloading helps, 16 GB of VRAM is still too small for full fine-tuning without extreme slowdowns.')">
+                    C) Full Parameter Fine-Tuning with CPU offloading
+                </div>
+            </div>
+            <div id="quiz-feedback" class="feedback-message"></div>
+        </section>
+
+        <section class="success-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div>
+                <strong>Next Step:</strong> Once you verify CUDA is working, let me know the output of <code>verify_gpu.py</code>! In the next lesson, we will download a medical text dataset and explore data structuring.
+            </div>
+        </section>
+
+        <div class="nav-links">
+            <a href="../RESOURCES.md" class="nav-link">&larr; Read Resources</a>
+            <a href="../MISSION.md" class="nav-link">View Mission &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(id) {
+            const codeEl = document.getElementById(id);
+            const text = codeEl.innerText.replace(/^#.*\n/gm, ''); // Strip comments if wanted, or copy all
+            navigator.clipboard.writeText(codeEl.innerText).then(() => {
+                const btn = codeEl.parentElement.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                }, 2000);
+            });
+        }
+
+        function checkAnswer(selectedOption, isCorrect, explanation) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.className = 'feedback-message correct';
+                feedback.innerText = "🎉 " + explanation;
+            } else {
+                selectedOption.classList.add('wrong');
+                feedback.className = 'feedback-message wrong';
+                feedback.innerText = "❌ " + explanation;
+            }
+        }
+    </script>
+</body>
+</html>
