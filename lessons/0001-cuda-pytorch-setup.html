@@ -278,32 +278,32 @@
             <h2><span class="number">2</span> Step 1: Verify System GPU Drivers</h2>
             <p>Before installing Python libraries, check if your Ubuntu system recognizes the NVIDIA GPU and driver. Run this in your terminal:</p>
             <pre><button class="copy-btn" onclick="copyCode('cmd-smi')">Copy</button><code id="cmd-smi">nvidia-smi</code></pre>
-            <p><strong>Expected Output:</strong> You should see a table detailing your GPU name (e.g., NVIDIA GeForce RTX 4060 Ti), total VRAM (around 16384 MiB), and the current CUDA Driver Version (e.g., 12.1, 12.2, etc.).</p>
+            <p><strong>Expected Output:</strong> You should see a table detailing your GPU name (e.g., NVIDIA GeForce RTX 4060 Ti), total VRAM (around 16380 MiB), and the current CUDA Driver Version (e.g., 13.0).</p>
         </section>
 
         <section class="section-card">
-            <h2><span class="number">3</span> Step 2: Create a Clean Virtual Environment</h2>
-            <p>Using a Python virtual environment prevents package conflicts. Run the following commands in your shell:</p>
-            <pre><button class="copy-btn" onclick="copyCode('cmd-venv')">Copy</button><code id="cmd-venv"># Navigate to your workspace directory
-cd ~/Projetos/learning-fine-tuning
+            <h2><span class="number">3</span> Step 2: Create a Conda Environment</h2>
+            <p>Using a Conda environment prevents package conflicts and allows easy management of PyTorch and CUDA versions. Run the following commands in your shell:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-venv')">Copy</button><code id="cmd-venv"># Create a new conda environment named 'fine-tuning' with Python 3.10
+conda create -y -n fine-tuning python=3.10
 
-# Create a virtual environment named 'venv'
-python3 -m venv venv
-
-# Activate the virtual environment
-source venv/bin/activate</code></pre>
+# Activate the conda environment
+conda activate fine-tuning</code></pre>
         </section>
 
         <section class="section-card">
-            <h2><span class="number">4</span> Step 3: Install PyTorch with CUDA 12.1</h2>
-            <p>By default, <code>pip install torch</code> may pull down a CPU-only build or a version mismatch. We will explicitly target CUDA 12.1 wheel indices to match modern GPUs:</p>
-            <pre><button class="copy-btn" onclick="copyCode('cmd-pip')">Copy</button><code id="cmd-pip">pip install --upgrade pip
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121</code></pre>
+            <h2><span class="number">4</span> Step 3: Install PyTorch with CUDA 12.4</h2>
+            <p>Your NVIDIA driver supports **CUDA 13.0**, but PyTorch runs on CUDA 12.1 or 12.4 runtime wheels, which are fully backward-compatible. We will install PyTorch targeting the CUDA 12.4 runtime for best compatibility with your setup:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-pip')">Copy</button><code id="cmd-pip"># Install via conda
+conda install -y pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvidia
+
+# Alternatively, you can use pip inside your active conda environment:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124</code></pre>
         </section>
 
         <section class="section-card">
             <h2><span class="number">5</span> Step 4: Run the Verification Script</h2>
-            <p>Create a verification script to query PyTorch. You can save this file as <code>verify_gpu.py</code> in your workspace root:</p>
+            <p>Create a verification script to query PyTorch. You can save this file as <code>scripts/verify_gpu.py</code>:</p>
             <pre><button class="copy-btn" onclick="copyCode('code-verify')">Copy</button><code id="code-verify">import torch
 
 print("=== PyTorch GPU Verification ===")
@@ -323,6 +323,7 @@ if cuda_available:
     print(f"Total VRAM: {memory_gb:.2f} GB")
     
     # Run a quick tensor computation on the GPU
+    torch.manual_seed(42)
     x = torch.rand(3, 3).cuda()
     y = torch.rand(3, 3).cuda()
     z = x @ y
@@ -330,7 +331,7 @@ if cuda_available:
 else:
     print("❌ GPU not detected. PyTorch is running in CPU mode.")</code></pre>
             <p>Execute the script inside your activated environment:</p>
-            <pre><button class="copy-btn" onclick="copyCode('cmd-run')">Copy</button><code id="cmd-run">python verify_gpu.py</code></pre>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-run')">Copy</button><code id="cmd-run">python scripts/verify_gpu.py</code></pre>
         </section>
 
         <section class="section-card quiz-container" id="quiz">
@@ -358,8 +359,8 @@ else:
         </section>
 
         <div class="nav-links">
-            <a href="../RESOURCES.md" class="nav-link">&larr; Read Resources</a>
-            <a href="../MISSION.md" class="nav-link">View Mission &rarr;</a>
+            <a href="README.md" class="nav-link">&larr; Curriculum Index</a>
+            <a href="0002-data-tokenization-prompting.html" class="nav-link">Lesson 2: Tokenization & Prompting &rarr;</a>
         </div>
     </div>
 

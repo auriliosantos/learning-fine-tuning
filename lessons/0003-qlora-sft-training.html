@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 3: QLoRA Fine-Tuning on Local GPU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --success-color: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --warning-color: #f59e0b;
+            --code-bg: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+        }
+
+        h2 .number {
+            background-color: var(--accent-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--code-bg);
+            color: #f43f5e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #030712;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            position: relative;
+            margin: 16px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: #e5e7eb;
+            padding: 0;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .quiz-container {
+            background: rgba(16, 185, 129, 0.03);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .quiz-question {
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-color);
+        }
+
+        .quiz-option.correct {
+            background: var(--success-glow);
+            border-color: var(--success-color);
+        }
+
+        .quiz-option.wrong {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        .feedback-message {
+            margin-top: 16px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback-message.correct {
+            color: var(--success-color);
+        }
+
+        .feedback-message.wrong {
+            color: #f87171;
+        }
+
+        .success-box {
+            background: var(--success-glow);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-box svg {
+            color: var(--success-color);
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .nav-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="meta-badge">Lesson 3 &bull; 20 Minutes &bull; Hands-On Training</span>
+            <h1>QLoRA Fine-Tuning on Local GPU</h1>
+            <p class="subtitle">Train a model on clinical text using Hugging Face PEFT and TRL under 16 GB of VRAM.</p>
+        </header>
+
+        <section class="section-card">
+            <h2><span class="number">1</span> What is QLoRA?</h2>
+            <p>Fine-tuning an 8B parameter model in full 16-bit precision requires over 160 GB of VRAM to store the model, gradients, and optimizer states. To fit this on your 16 GB RTX 4060 Ti GPU, we must use <strong>QLoRA (Quantized Low-Rank Adaptation)</strong>:</p>
+            <ul>
+                <li><strong>4-bit NormalFloat (NF4) Quantization</strong>: Compresses the base model weights from 16-bit to 4-bit, saving ~75% memory.</li>
+                <li><strong>Double Quantization</strong>: Quantizes the quantization constants, saving an extra 0.37 bits per parameter.</li>
+                <li><strong>Low-Rank Adapters (LoRA)</strong>: Keeps the base model weights frozen. It inserts small trainable parameter matrices (determined by rank <code>r</code> and scaling factor <code>alpha</code>) into target modules (like self-attention projection weights).</li>
+            </ul>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">2</span> Key Training Hyperparameters</h2>
+            <p>When writing your fine-tuning scripts, pay special attention to these parameters:</p>
+            <ul>
+                <li><strong>Rank (<code>r</code>)</strong>: The dimension of the LoRA update matrices (typically 8, 16, 32, or 64). Higher ranks capture more details but consume more VRAM.</li>
+                <li><strong>LoRA Alpha (<code>lora_alpha</code>)</strong>: The scaling factor for the LoRA adapter weights. A standard choice is <code>2 * r</code>.</li>
+                <li><strong>Target Modules</strong>: Which layers to attach adapters to. For maximum performance, target all attention projections (<code>q_proj</code>, <code>k_proj</code>, <code>v_proj</code>, <code>o_proj</code>) and MLP blocks (<code>gate_proj</code>, <code>up_proj</code>, <code>down_proj</code>).</li>
+                <li><strong>Paged Optimizer</strong>: <code>paged_adamw_8bit</code> offloads optimizer memory spikes to CPU RAM to prevent Out-Of-Memory (OOM) errors.</li>
+                <li><strong>Gradient Checkpointing</strong>: Drastically reduces VRAM usage by recalculating activations during the backward pass instead of storing them in VRAM.</li>
+            </ul>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">3</span> Install Training Libraries</h2>
+            <p>Activate your Conda environment and install the required Hugging Face libraries along with `bitsandbytes` (which performs the 4-bit quantization routines):</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-pip-train')">Copy</button><code id="cmd-pip-train">conda activate fine-tuning
+pip install trl peft transformers bitsandbytes accelerate datasets</code></pre>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">4</span> Code: The QLoRA SFT Training Script</h2>
+            <p>Create a script named <code>scripts/train_qlora.py</code>. This script programmatically compiles a dummy clinical dataset, loads the model in 4-bit with PEFT, and runs a mock training cycle:</p>
+            <pre><button class="copy-btn" onclick="copyCode('code-train')">Copy</button><code id="code-train">import torch
+from datasets import Dataset
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
+from peft import LoraConfig, get_peft_model
+from trl import SFTTrainer
+
+print("=== 1. Preparing Dataset ===")
+# Synthetic clinical data matching Lesson 2 chat structure
+data = [
+    {
+        "role_system": "You are a clinical NLP assistant. Extract structured JSON containing: 'chief_complaint', 'duration', and 'medications'.",
+        "role_user": "Patient presents with severe throbbing headache for 3 days. Denies fever. Currently taking Ibuprofen 400mg as needed.",
+        "role_assistant": '{"chief_complaint": "severe throbbing headache", "duration": "3 days", "medications": "Ibuprofen 400mg as needed"}'
+    },
+    {
+        "role_system": "You are a clinical NLP assistant. Extract structured JSON containing: 'chief_complaint', 'duration', and 'medications'.",
+        "role_user": "Fever and dry cough for 5 days. Not taking any medication currently.",
+        "role_assistant": '{"chief_complaint": "fever and dry cough", "duration": "5 days", "medications": "none"}'
+    }
+] * 10  # Multiply data to create a tiny training set of 20 samples
+
+# Map samples to Llama 3 chat format
+formatted_dataset = []
+for item in data:
+    chat = [
+        {"role": "system", "content": item["role_system"]},
+        {"role": "user", "content": item["role_user"]},
+        {"role": "assistant", "content": item["role_assistant"]}
+    ]
+    formatted_dataset.append({"messages": chat})
+
+dataset = Dataset.from_list(formatted_dataset)
+
+print("=== 2. Setting Up Tokenizer and Quantization ===")
+# Using a lightweight local LLM model for training demonstration
+model_id = "NousResearch/Meta-Llama-3-8B-Instruct"
+
+# 4-bit Quantization configuration
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype=torch.bfloat16 # RTX 4060 Ti supports bfloat16 natively
+)
+
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+# Llama 3 does not have a default pad token, so we configure it to use eos_token
+tokenizer.pad_token = tokenizer.eos_token
+tokenizer.padding_side = "right"
+
+print("=== 3. Loading Model with QLoRA Configuration ===")
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    quantization_config=bnb_config,
+    device_map="auto"
+)
+
+# Enable gradient checkpointing to save massive VRAM
+model.gradient_checkpointing_enable()
+
+# Configure LoRA Adapters
+peft_config = LoraConfig(
+    r=16,
+    lora_alpha=32,
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM"
+)
+model = get_peft_model(model, peft_config)
+model.print_trainable_parameters()
+
+print("=== 4. Initializing SFTTrainer & Launching Training ===")
+training_args = TrainingArguments(
+    output_dir="./qlora_output",
+    per_device_train_batch_size=1, # Keep small for VRAM safety
+    gradient_accumulation_steps=4, # Effective batch size = 4
+    optim="paged_adamw_8bit",      # Paged optimizer offloads RAM spike
+    learning_rate=2e-4,
+    logging_steps=1,
+    max_steps=5,                   # Short run for quick verification
+    fp16=False,
+    bf16=True,                     # Native RTX 40 series support
+    gradient_checkpointing=True,
+    report_to="none"
+)
+
+trainer = SFTTrainer(
+    model=model,
+    train_dataset=dataset,
+    peft_config=peft_config,
+    max_seq_length=512,
+    tokenizer=tokenizer,
+    args=training_args,
+)
+
+# Launch training!
+trainer.train()
+print("\n🎉 Training completed successfully and checkpoints saved in ./qlora_output!")</code></pre>
+            <p>Run the training script in your shell:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-run-train')">Copy</button><code id="cmd-run-train">python scripts/train_qlora.py</code></pre>
+        </section>
+
+        <section class="section-card quiz-container" id="quiz">
+            <h2>Interactive Checkpoint</h2>
+            <div class="quiz-question">Which parameter combination is crucial for ensuring that training an 8B model doesn't hit an Out-Of-Memory (OOM) error on a 16 GB GPU, by letting the optimizer offload memory spikes and preventing the storage of intermediate activations?</div>
+            <div class="quiz-options">
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'While r=16 and bf16=True are good defaults, they do not manage intermediate activation caching or optimizer states, which is where OOMs usually trigger.')">
+                    A) r=16 and bf16=True
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true, 'Correct! Gradient Checkpointing recalculates activation layers instead of keeping them in memory, and the Paged AdamW optimizer offloads page states dynamically. Together, they prevent VRAM overflow.')">
+                    B) gradient_checkpointing=True and optim="paged_adamw_8bit"
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'Double quantization saves small chunks of memory, but without gradient checkpointing to release memory from long attention sequences, the GPU will quickly crash during backpropagation.')">
+                    C) bnb_4bit_use_double_quant=True and fp16=True
+                </div>
+            </div>
+            <div id="quiz-feedback" class="feedback-message"></div>
+        </section>
+
+        <section class="success-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div>
+                <strong>Next Step:</strong> Run the training script! It might take a few moments to fetch Llama 3's files from the Hub. Once you see the loss decreasing over the steps, let me know. In Lesson 4, we will learn how to enforce rigorous JSON validation formats on your trained adapter.
+            </div>
+        </section>
+
+        <div class="nav-links">
+            <a href="README.md" class="nav-link">&larr; Curriculum Index</a>
+            <a href="0004-structured-output-validation.html" class="nav-link">Lesson 4: Structured Output Validation &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(id) {
+            const codeEl = document.getElementById(id);
+            navigator.clipboard.writeText(codeEl.innerText).then(() => {
+                const btn = codeEl.parentElement.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                }, 2000);
+            });
+        }
+
+        function checkAnswer(selectedOption, isCorrect, explanation) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.className = 'feedback-message correct';
+                feedback.innerText = "🎉 " + explanation;
+            } else {
+                selectedOption.classList.add('wrong');
+                feedback.className = 'feedback-message wrong';
+                feedback.innerText = "❌ " + explanation;
+            }
+        }
+    </script>
+</body>
+</html>

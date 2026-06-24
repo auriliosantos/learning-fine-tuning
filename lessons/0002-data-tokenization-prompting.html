@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 2: Tokenization & Prompting for Clinical Text</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --success-color: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --warning-color: #f59e0b;
+            --code-bg: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+        }
+
+        h2 .number {
+            background-color: var(--accent-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--code-bg);
+            color: #f43f5e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #030712;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            position: relative;
+            margin: 16px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: #e5e7eb;
+            padding: 0;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .quiz-container {
+            background: rgba(16, 185, 129, 0.03);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .quiz-question {
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-color);
+        }
+
+        .quiz-option.correct {
+            background: var(--success-glow);
+            border-color: var(--success-color);
+        }
+
+        .quiz-option.wrong {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        .feedback-message {
+            margin-top: 16px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback-message.correct {
+            color: var(--success-color);
+        }
+
+        .feedback-message.wrong {
+            color: #f87171;
+        }
+
+        .success-box {
+            background: var(--success-glow);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-box svg {
+            color: var(--success-color);
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .nav-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="meta-badge">Lesson 2 &bull; 15 Minutes &bull; Concept & Code</span>
+            <h1>Tokenization & Prompting for Clinical Text</h1>
+            <p class="subtitle">Understand tokenization mechanics, chat templates, and formatting medical notes for training.</p>
+        </header>
+
+        <section class="section-card">
+            <h2><span class="number">1</span> What is Tokenization?</h2>
+            <p>LLMs do not read raw strings. Instead, they process text as a sequence of numbers. A <strong>tokenizer</strong> is responsible for breaking strings into smaller pieces called <strong>tokens</strong> (which can be whole words, subwords, or individual characters) and mapping them to integer IDs in a predefined <strong>vocabulary</strong>.</p>
+            <p>In fine-tuning, you must use the exact same tokenizer that the base model was trained on. A mismatch in vocabulary or special tokens will corrupt the model's understanding.</p>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">2</span> Llama 3 Chat Templates & Special Tokens</h2>
+            <p>To perform instruction tuning (like converting a raw doctor note into structured JSON), we structure our training data using a **chat template**. A template segments inputs into distinct roles (system, user, and assistant) using **special tokens** that mark bounds:</p>
+            <ul>
+                <li><code>&lt;|begin_of_text|&gt;</code>: Starts the token sequence.</li>
+                <li><code>&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;</code>: Identifies the system prompt.</li>
+                <li><code>&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;</code>: Identifies user query.</li>
+                <li><code>&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;</code>: Marks the model's response.</li>
+                <li><code>&lt;|eot_id|&gt;</code>: End of turn identifier.</li>
+            </ul>
+            <p>Hugging Face's <code>apply_chat_template()</code> automates this formatting so you don't need to manually inject these tokens.</p>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">3</span> Practice Code: Tokenizing Clinical Anamnesis</h2>
+            <p>Let's write a Python script using <code>transformers</code> to tokenize a sample clinical note. Make sure you activate your Conda environment (<code>conda activate fine-tuning</code>) and install <code>transformers</code> first:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-pip-install')">Copy</button><code id="cmd-pip-install">pip install transformers huggingface_hub</code></pre>
+            <p>Create a script named <code>scripts/tokenize_anamnesis.py</code>:</p>
+            <pre><button class="copy-btn" onclick="copyCode('code-tokenize')">Copy</button><code id="code-tokenize">from transformers import AutoTokenizer
+
+# We will use the Llama-3 8B Instruct tokenizer
+model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+# Note: You can use a local or open equivalent if HF access is restricted, e.g., "NousResearch/Meta-Llama-3-8B-Instruct"
+tokenizer = AutoTokenizer.from_pretrained("NousResearch/Meta-Llama-3-8B-Instruct")
+
+# Define the chat dialogue for a clinical notes task
+messages = [
+    {
+        "role": "system",
+        "content": "You are a clinical NLP assistant. Extract structured JSON containing: 'chief_complaint', 'duration', and 'medications'."
+    },
+    {
+        "role": "user",
+        "content": "Patient presents with severe throbbing headache for 3 days. Denies fever. Currently taking Ibuprofen 400mg as needed."
+    }
+]
+
+# Apply the model's chat template
+formatted_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+print("=== Formatted Chat Prompt ===")
+print(formatted_prompt)
+
+# Convert prompt string to token IDs
+token_ids = tokenizer.encode(formatted_prompt)
+print("\n=== Token IDs ===")
+print(token_ids[:30], "... (total tokens:", len(token_ids), ")")
+
+# Decode back to verify the tokens
+decoded_tokens = [tokenizer.decode([tid]) for tid in token_ids[:15]]
+print("\n=== Individual Decoded Subwords ===")
+print(decoded_tokens)</code></pre>
+            <p>Run the script:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-run-tokenize')">Copy</button><code id="cmd-run-tokenize">python scripts/tokenize_anamnesis.py</code></pre>
+        </section>
+
+        <section class="section-card quiz-container" id="quiz">
+            <h2>Interactive Checkpoint</h2>
+            <div class="quiz-question">Why must we set `tokenize=False` when calling `apply_chat_template` in the preprocessing pipeline if we plan to run standard token masking?</div>
+            <div class="quiz-options">
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'Actually, tokenizing directly is faster, but it makes it harder to compute masks since we want to align the exact user and assistant tokens for loss calculation.')">
+                    A) Direct tokenization is broken in Hugging Face.
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true, 'Correct! Setting tokenize=False returns a raw formatted string, letting us calculate the lengths of the user prompt vs. the assistant response. This allows us to mask out user instruction tokens (setting their label IDs to -100) so the model only learns to predict the assistant\'s answer.')">
+                    B) Returning the raw string first allows us to compute labels and mask out user instructions.
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'Setting tokenize=False does not affect tokenizer speed, it is purely a configuration choice for ease of masking and padding.')">
+                    C) Setting tokenize=False is required to keep the GPU from running out of VRAM.
+                </div>
+            </div>
+            <div id="quiz-feedback" class="feedback-message"></div>
+        </section>
+
+        <section class="success-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div>
+                <strong>Next Step:</strong> Run the tokenization script to see the underlying subwords. In the next lesson, we will set up the <code>SFTTrainer</code> from TRL to run QLoRA training on a clinical dataset!
+            </div>
+        </section>
+
+        <div class="nav-links">
+            <a href="README.md" class="nav-link">&larr; Curriculum Index</a>
+            <a href="0003-qlora-sft-training.html" class="nav-link">Lesson 3: QLoRA Fine-Tuning &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(id) {
+            const codeEl = document.getElementById(id);
+            navigator.clipboard.writeText(codeEl.innerText).then(() => {
+                const btn = codeEl.parentElement.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                }, 2000);
+            });
+        }
+
+        function checkAnswer(selectedOption, isCorrect, explanation) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.className = 'feedback-message correct';
+                feedback.innerText = "🎉 " + explanation;
+            } else {
+                selectedOption.classList.add('wrong');
+                feedback.className = 'feedback-message wrong';
+                feedback.innerText = "❌ " + explanation;
+            }
+        }
+    </script>
+</body>
+</html>

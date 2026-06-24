@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 4B: Clinical Terminology Linking & Labeling Strategies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --success-color: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --warning-color: #f59e0b;
+            --code-bg: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+        }
+
+        h2 .number {
+            background-color: var(--accent-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #e5e7eb;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 10px;
+        }
+
+        p, li {
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--code-bg);
+            color: #f43f5e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #030712;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            position: relative;
+            margin: 16px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: #e5e7eb;
+            padding: 0;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background-color: rgba(255, 255, 255, 0.02);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .quiz-container {
+            background: rgba(16, 185, 129, 0.03);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .quiz-question {
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-color);
+        }
+
+        .quiz-option.correct {
+            background: var(--success-glow);
+            border-color: var(--success-color);
+        }
+
+        .quiz-option.wrong {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        .feedback-message {
+            margin-top: 16px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback-message.correct {
+            color: var(--success-color);
+        }
+
+        .feedback-message.wrong {
+            color: #f87171;
+        }
+
+        .success-box {
+            background: var(--success-glow);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-box svg {
+            color: var(--success-color);
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .nav-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="meta-badge">Lesson 4B &bull; 15 Minutes &bull; Clinical System Design</span>
+            <h1>Clinical Terminology & Labeling Strategies</h1>
+            <p class="subtitle">Resolve synonyms with SNOMED CT, scientifically sample historical notes, and choose the right base model.</p>
+        </header>
+
+        <section class="section-card">
+            <h2><span class="number">1</span> Resolving Abbreviations & Synonyms (SNOMED CT)</h2>
+            <p>Doctors express the same clinical concepts in multiple ways: a chart might note <strong>HAS</strong>, <strong>Hipertensão Arterial</strong>, <strong>Pressão Alta</strong>, or <strong>HTN</strong>. To make this data useful for billing or clinical research, we must map (normalize) these variants to a unique concept in a standard medical ontology like <strong>SNOMED CT</strong>.</p>
+            
+            <h3>The Recommended Architecture: Post-Hoc Entity Linking</h3>
+            <p>Instead of forcing the LLM to learn and output raw SNOMED codes (which frequently changes and increases hallucinations), use a two-step pipeline:</p>
+            <ol>
+                <li><strong>Extraction Step (LLM)</strong>: Extract the clinical text verbatim (e.g. <code>chief_complaint: "HAS"</code>).</li>
+                <li><strong>Normalization Step (Encoder/Search)</strong>: Pass the verbatim term to a specialized encoder model (e.g., <strong>SapBERT</strong> or <strong>MedCAT</strong>) or query a local Vector Database loaded with the SNOMED CT Concept descriptions.</li>
+            </ol>
+            <p>For example, searching a vector database containing SNOMED descriptions for <em>"pressão alta"</em> will yield the Concept ID <code>38341003</code> (Hypertensive Disorder) because their semantic embeddings align closely.</p>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">2</span> Scientific Sampling: How Much Data to Label?</h2>
+            <p>In medical NLP, labeling data requires valuable clinical hours. Randomly choosing 1,000 historical notes is highly inefficient. We must use a scientific approach to determine the size and composition of the labeling batch:</p>
+
+            <h3>1. Vocabulary Saturation (Heaps' Law)</h3>
+            <p>Heaps' Law describes vocabulary growth in a text corpus: $V(n) = K n^\beta$. As you process more notes, you encounter fewer and fewer novel abbreviations and synonyms. By tracking the **Type-Token Ratio (TTR)**, you can identify the exact point where adding more labeled notes yields diminishing returns (e.g. less than a 3% increase in new vocabulary terms).</p>
+
+            <h3>2. Representative Clustering</h3>
+            <p>To capture rare terminologies without massive labeling, use this pipeline:</p>
+            <ol>
+                <li>Embed all historical notes using a multilingual embedding model (e.g. <code>multilingual-e5-base</code>).</li>
+                <li>Cluster the notes using <strong>K-Means</strong> (e.g. 10 clusters).</li>
+                <li>Sample notes proportionally from each cluster (and audit outliers) to guarantee your labeling batch covers all clinical departments and formatting variants.</li>
+            </ol>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">3</span> Base Model Selection Decision Framework</h2>
+            <p>Choosing the right base model impacts both performance and VRAM usage. When working with non-English data (like Portuguese), **tokenizer efficiency** is a critical factor:</p>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Model Family</th>
+                        <th>Multilingual Support</th>
+                        <th>Vocabulary Size</th>
+                        <th>Context Length</th>
+                        <th>Strengths / VRAM Compatibility</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Qwen 2/2.5 (Alibaba)</strong></td>
+                        <td>Excellent (PT-BR native)</td>
+                        <td>~151k tokens</td>
+                        <td>up to 128k</td>
+                        <td>High density tokenizer (fewer subwords for PT), excellent reasoning at 7B/14B sizes. Fits in 16GB.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DeepSeek V3 / Coder</strong></td>
+                        <td>Strong</td>
+                        <td>~129k tokens</td>
+                        <td>up to 128k</td>
+                        <td>Highly competitive on logical reasoning. DeepSeek-Lite (8B) runs comfortably in 4-bit.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemma 2 (Google)</strong></td>
+                        <td>Moderate</td>
+                        <td>~256k tokens</td>
+                        <td>8k</td>
+                        <td>State-of-the-art 9B capabilities. Requires careful padding config during training.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Llama 3 (Meta)</strong></td>
+                        <td>Fair (English biased)</td>
+                        <td>~128k tokens</td>
+                        <td>8k / 128k (L3.1)</td>
+                        <td>Massive community support. Splitting PT-BR words into more subwords (1.3x higher token counts).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Crucial Takeaway:</strong> For Portuguese (PT-BR) fine-tuning, models with larger, natively multilingual vocabularies (like <strong>Qwen 2.5</strong>) require <strong>30-40% fewer tokens</strong> to represent the same text compared to Llama 3, leading to faster training and lower VRAM usage!</p>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">4</span> Code: Terminology Saturation Analysis</h2>
+            <p>Run the script <code>scripts/analyze_saturation.py</code> generated in your workspace to simulate clinical note accumulation. This script parses synthetic notes containing Brazilian clinical synonyms and abbreviations (e.g. <em>HAS, DM2, cefaleia</em>), maps their Type-Token growth, and calculates the exact saturation cutoff:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-run-sat')">Copy</button><code id="cmd-run-sat">python scripts/analyze_saturation.py</code></pre>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">5</span> UI Design for Medical Annotation (Web App)</h2>
+            <p>For doctors to easily review and label data, you can build a simple <strong>Streamlit</strong> dashboard that interacts with the LLM pipeline:</p>
+            <ul>
+                <li><strong>Raw Display</strong>: Displays the raw clinical note on the left.</li>
+                <li><strong>Pre-filled AI Suggestions</strong>: The app runs the note through the LLM and displays the extracted fields (Chief Complaint, Duration, Medications) in editable input boxes.</li>
+                <li><strong>Ontology Suggestion Box</strong>: Connect input fields to a SNOMED CT API (like UMLS or local vector search) so that as the doctor types or reviews, it auto-completes the standard SNOMED concept term and ID.</li>
+            </ul>
+        </section>
+
+        <section class="section-card quiz-container" id="quiz">
+            <h2>Interactive Checkpoint</h2>
+            <div class="quiz-question">Why does Qwen 2/2.5 or DeepSeek generally run faster and use less memory than Llama 3 during Portuguese (PT-BR) fine-tuning?</div>
+            <div class="quiz-options">
+                <div class="quiz-option" onclick="checkAnswer(this, true, 'Correct! Tokenizers not optimized for a language break words into tiny subwords or character segments, increasing token counts. A multilingual vocabulary tokenizer (like Qwen\'s 151k) maps complete Portuguese words into single tokens, reducing context load by 30-40%.')">
+                    A) They have larger, multilingual vocabularies that prevent subword fragmentation in Portuguese.
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'No, Qwen and Llama 3 use similar transformer layers and attention types. The difference is vocabulary-based.')">
+                    B) They use a completely different form of GPU memory management that doesn\'t require CUDA.
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'No, Qwen is trained on standard float formats like bfloat16 just like Llama.')">
+                    C) They automatically compress input text to 4-bit before tokenization.
+                </div>
+            </div>
+            <div id="quiz-feedback" class="feedback-message"></div>
+        </section>
+
+        <section class="success-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div>
+                <strong>Congratulations!</strong> You have successfully finished the entire Phase 1 curriculum on Clinical Text Structuring. In Phase 2, we will explore Vision-Language Models (VLMs) and train them on medical PDF documents.
+            </div>
+        </section>
+
+        <div class="nav-links">
+            <a href="README.md" class="nav-link">&larr; Curriculum Index</a>
+            <a href="#" class="nav-link" style="opacity: 0.5; cursor: not-allowed;">Lesson 5: VLM Classification (Coming Soon) &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(id) {
+            const codeEl = document.getElementById(id);
+            navigator.clipboard.writeText(codeEl.innerText).then(() => {
+                const btn = codeEl.parentElement.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                }, 2000);
+            });
+        }
+
+        function checkAnswer(selectedOption, isCorrect, explanation) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.className = 'feedback-message correct';
+                feedback.innerText = "🎉 " + explanation;
+            } else {
+                selectedOption.classList.add('wrong');
+                feedback.className = 'feedback-message wrong';
+                feedback.innerText = "❌ " + explanation;
+            }
+        }
+    </script>
+</body>
+</html>

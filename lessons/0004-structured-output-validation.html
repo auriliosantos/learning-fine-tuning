@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 4: Structured Output Validation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --success-color: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --warning-color: #f59e0b;
+            --code-bg: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+        }
+
+        h2 .number {
+            background-color: var(--accent-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--code-bg);
+            color: #f43f5e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #030712;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            position: relative;
+            margin: 16px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: #e5e7eb;
+            padding: 0;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .quiz-container {
+            background: rgba(16, 185, 129, 0.03);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .quiz-question {
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-color);
+        }
+
+        .quiz-option.correct {
+            background: var(--success-glow);
+            border-color: var(--success-color);
+        }
+
+        .quiz-option.wrong {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        .feedback-message {
+            margin-top: 16px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback-message.correct {
+            color: var(--success-color);
+        }
+
+        .feedback-message.wrong {
+            color: #f87171;
+        }
+
+        .success-box {
+            background: var(--success-glow);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-box svg {
+            color: var(--success-color);
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .nav-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="meta-badge">Lesson 4 &bull; 15 Minutes &bull; Advanced Inference</span>
+            <h1>Structured Output Validation</h1>
+            <p class="subtitle">Enforce JSON schema layout guarantees on your fine-tuned adapters using guided decoding.</p>
+        </header>
+
+        <section class="section-card">
+            <h2><span class="number">1</span> Why Guarantee JSON?</h2>
+            <p>In medical NLP applications, extraction outputs are fed directly into Electronic Health Record (EHR) databases, visualization frontends, or diagnostic APIs. A single missing double quote, extra field, or conversational preamble (e.g. <em>"Sure, here is the JSON extraction..."</em>) will crash downstream parsers.</p>
+            <p>We cannot rely purely on prompt engineering to get perfect JSON. We need programmatic constraints during text generation.</p>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">2</span> Two Paradigms: Parsing vs. Guided Decoding</h2>
+            <p>There are two primary approaches to enforcing outputs:</p>
+            <ul>
+                <li><strong>Post-Hoc Parsing & Retrying (e.g. <code>Instructor</code>)</strong>: The model generates standard free-form text. A parser (like <code>Pydantic</code>) checks the output. If it fails, the script queries the model again with the validation error. This wastes tokens and VRAM.</li>
+                <li><strong>Guided Decoding (e.g. <code>Outlines</code>, <code>Guidance</code>)</strong>: Modifies the model's token sampling probabilities at <em>each generation step</em>. Tokens that would violate the target JSON schema or Regex are assigned a probability of zero. The model is **mathematically guaranteed** to generate a valid schema representation on the first attempt.</li>
+            </ul>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">3</span> Install Validation Libraries</h2>
+            <p>Activate your Conda environment and install `outlines` and `pydantic` to run guided inference:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-pip-val')">Copy</button><code id="cmd-pip-val">conda activate fine-tuning
+pip install outlines pydantic</code></pre>
+        </section>
+
+        <section class="section-card">
+            <h2><span class="number">4</span> Code: Guided Inference with your QLoRA Adapter</h2>
+            <p>Create a script named <code>scripts/structured_inference.py</code>. This script loads your fine-tuned model and adapter from Lesson 3, defines a Pydantic schema, and guides token generation to produce guaranteed JSON:</p>
+            <pre><button class="copy-btn" onclick="copyCode('code-val')">Copy</button><code id="code-val">import torch
+from pydantic import BaseModel, Field
+from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import outlines
+
+# 1. Define the Pydantic schema matching your clinical database requirements
+class ClinicalAnamnesis(BaseModel):
+    chief_complaint: str = Field(description="The primary clinical complaint or symptom")
+    duration: str = Field(description="The duration of the complaint")
+    medications: str = Field(description="List of current medications or 'none'")
+
+# 2. Configs
+model_id = "NousResearch/Meta-Llama-3-8B-Instruct"
+adapter_id = "./qlora_output" # Path to adapter weights saved in Lesson 3
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
+
+print("=== 1. Loading Base Model ===")
+base_model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    quantization_config=bnb_config,
+    device_map="auto"
+)
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+
+print("=== 2. Attaching Fine-Tuned QLoRA Adapter ===")
+model = PeftModel.from_pretrained(base_model, adapter_id)
+model.eval() # Set model to evaluation mode
+
+print("=== 3. Wrapping Model with Outlines ===")
+# Wrap the PyTorch model and tokenizer with Outlines
+outlines_model = outlines.models.Transformers(model, tokenizer)
+
+# Compile a JSON generator bound to the Pydantic schema
+generator = outlines.generate.json(outlines_model, ClinicalAnamnesis)
+
+# 4. Define raw clinical anamnesis query
+new_clinical_note = "Patient complains of sharp lower back pain since yesterday morning. Took Acetaminophen 500mg once."
+
+prompt = (
+    f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
+    f"You are a clinical NLP assistant. Extract structured JSON containing: 'chief_complaint', 'duration', and 'medications'.<|eot_id|>"
+    f"<|start_header_id|>user<|end_header_id|>\n\n{new_clinical_note}<|eot_id|>"
+    f"<|start_header_id|>assistant<|end_header_id|>\n\n"
+)
+
+print("=== 4. Executing Guided Generation ===")
+# This is guaranteed to conform to the ClinicalAnamnesis schema structure
+structured_data = generator(prompt)
+
+print("\n🎉 Output Successfully Generated and Validated!")
+print("===========================================")
+print("Type:", type(structured_data))
+print("JSON Object:", structured_data)
+print("Chief Complaint:", structured_data.chief_complaint)
+print("Duration:", structured_data.duration)
+print("Medications:", structured_data.medications)</code></pre>
+            <p>Run the script:</p>
+            <pre><button class="copy-btn" onclick="copyCode('cmd-run-val')">Copy</button><code id="cmd-run-val">python scripts/structured_inference.py</code></pre>
+        </section>
+
+        <section class="section-card quiz-container" id="quiz">
+            <h2>Interactive Checkpoint</h2>
+            <div class="quiz-question">What is the main performance benefit of Guided Decoding (e.g., Outlines) over Post-Hoc Parsing (e.g., Instructor) for local GPU inference?</div>
+            <div class="quiz-options">
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'Guided decoding does not speed up base model loading; loading the weights takes the same time.')">
+                    A) It reduces the model weight loading time by 50%.
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true, 'Correct! By zeroing out logits of invalid tokens at each generation step, Guided Decoding ensures the very first response conforms to the schema. Post-Hoc Parsing relies on raw outputs and retries, which require extra model generation cycles and waste VRAM/compute.')">
+                    B) It guarantees compliance in a single generation pass, avoiding expensive retry cycles.
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'Guided decoding works directly with standard PyTorch logits, it does not perform any model quantization.')">
+                    C) It automatically quantizes the model to 2-bit on the fly.
+                </div>
+            </div>
+            <div id="quiz-feedback" class="feedback-message"></div>
+        </section>
+
+        <section class="success-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div>
+                <strong>Lesson 4 Completed!</strong> You have successfully taken unstructured medical records, tokenized them, trained a local QLoRA adapter on a consumer GPU, and forced the adapter to output validated JSON. Next, let's explore clinical term normalization, modeling choices, and data annotation campaigns before moving to Project 2.
+            </div>
+        </section>
+
+        <div class="nav-links">
+            <a href="README.md" class="nav-link">&larr; Curriculum Index</a>
+            <a href="0004b-snomed-labeling-strategies.html" class="nav-link">Lesson 4B: Clinical Terminology & Labeling &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(id) {
+            const codeEl = document.getElementById(id);
+            navigator.clipboard.writeText(codeEl.innerText).then(() => {
+                const btn = codeEl.parentElement.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                }, 2000);
+            });
+        }
+
+        function checkAnswer(selectedOption, isCorrect, explanation) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.className = 'feedback-message correct';
+                feedback.innerText = "🎉 " + explanation;
+            } else {
+                selectedOption.classList.add('wrong');
+                feedback.className = 'feedback-message wrong';
+                feedback.innerText = "❌ " + explanation;
+            }
+        }
+    </script>
+</body>
+</html>

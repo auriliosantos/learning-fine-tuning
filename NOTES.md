@@ -6,6 +6,7 @@
 - **RAM**: 32 GB RAM
 - **CPU**: AMD Ryzen 7 5800X3D
 - **Shell**: `zsh`
+- **Environment**: Conda
 
 ## Teaching & Lesson Preferences
 - **Pedagogy**: Balance of theory and practical tutorials.
@@ -23,3 +24,10 @@
 3. **Project 3 (Scintigraphy Segmentation & Reporting)**:
    - *Goal*: Segment bone scintigraphy scan and generate a clinical draft report.
    - *Skills*: Image segmentation (U-Net, SAM, or vision-based models) paired with a language generation model.
+4. **Project 4 (Diabetic Comorbidity Risk & Explainable Interventions)**:
+   - *Goal*: Predict risk of diabetic comorbidities based on lifestyle/health indicators, suggesting personalized interventions.
+   - *Skills*: LLM fine-tuning on structured/tabular health data, synthetic data generation, and "data morphing" / counterfactual explanation methods to explain recommended interventions.
+5. **Project 5 (Legal/Administrative Order Drafter)**:
+   - *Goal*: Generate drafts of official administrative orders including law citations and legal arguments from process context.
+   - *Skills*: Domain-specific legal LLM fine-tuning, citation matching/verification, structured document drafting, RAG vs. Fine-tuning trade-offs.
+
