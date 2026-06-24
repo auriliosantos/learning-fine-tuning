@@ -350,37 +350,86 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>Qwen 2/2.5 (Alibaba)</strong></td>
+                        <td><strong>Qwen 3 (Alibaba)</strong></td>
                         <td>Excellent (PT-BR native)</td>
                         <td>~151k tokens</td>
-                        <td>up to 128k</td>
-                        <td>High density tokenizer (fewer subwords for PT), excellent reasoning at 7B/14B sizes. Fits in 16GB.</td>
+                        <td>up to 1M</td>
+                        <td>High density tokenizer, excellent reasoning and agent capabilities. Open-weights models fit in local budgets.</td>
                     </tr>
                     <tr>
-                        <td><strong>DeepSeek V3 / Coder</strong></td>
+                        <td><strong>DeepSeek V4</strong></td>
                         <td>Strong</td>
-                        <td>~129k tokens</td>
-                        <td>up to 128k</td>
-                        <td>Highly competitive on logical reasoning. DeepSeek-Lite (8B) runs comfortably in 4-bit.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Gemma 2 (Google)</strong></td>
-                        <td>Moderate</td>
-                        <td>~256k tokens</td>
-                        <td>8k</td>
-                        <td>State-of-the-art 9B capabilities. Requires careful padding config during training.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Llama 3 (Meta)</strong></td>
-                        <td>Fair (English biased)</td>
                         <td>~128k tokens</td>
-                        <td>8k / 128k (L3.1)</td>
-                        <td>Massive community support. Splitting PT-BR words into more subwords (1.3x higher token counts).</td>
+                        <td>up to 1M</td>
+                        <td>Highly competitive reasoning. DeepSeek-V4-Flash offers fast throughput and small active parameter size.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemma 4 (Google)</strong></td>
+                        <td>Strong</td>
+                        <td>~262k tokens</td>
+                        <td>up to 256k</td>
+                        <td>High-performance 12B/4B/2B models with native multimodal (text/image/audio) support. 12B runs comfortably on workstations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Llama 4 (Meta)</strong></td>
+                        <td>Good (Improved multilingual)</td>
+                        <td>~128k tokens</td>
+                        <td>up to 10M</td>
+                        <td>Advanced Mixture-of-Experts (MoE) architecture (e.g. Scout with 17B active parameters). Splitting PT-BR words into more subwords.</td>
                     </tr>
                 </tbody>
             </table>
 
-            <p><strong>Crucial Takeaway:</strong> For Portuguese (PT-BR) fine-tuning, models with larger, natively multilingual vocabularies (like <strong>Qwen 2.5</strong>) require <strong>30-40% fewer tokens</strong> to represent the same text compared to Llama 3, leading to faster training and lower VRAM usage!</p>
+            <h3>Specialized Clinical/Medical Models</h3>
+            <p>If you need deep clinical knowledge or a model pre-trained on medical literature, consider these specialized open-weights alternatives:</p>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Model Family</th>
+                        <th>Medical Adaptation Type</th>
+                        <th>Best Used For</th>
+                        <th>Trade-offs / Key Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Meditron (EPFL)</strong></td>
+                        <td>Continual Pre-training (Clinical literature/guidelines)</td>
+                        <td>Evidence-based clinical QA, diagnostic reasoning, adherence to WHO guidelines. Available up to 70B parameters.</td>
+                        <td>Primarily English-biased; requires translation pipelines or local fine-tuning for Portuguese data.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BioMistral</strong></td>
+                        <td>Domain adaptation of Mistral</td>
+                        <td>Biomedical search, PubMed question answering, medical translation.</td>
+                        <td>Highly lightweight (7B base), making it cheap to deploy but less capable on complex reasoning than larger models.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MedGemma (Google)</strong></td>
+                        <td>Fine-tuning & Alignment of Gemma</td>
+                        <td>Clinical text processing combined with medical imaging (multimodal diagnostic tasks).</td>
+                        <td>Excellent for hybrid cloud/on-premise deployment, but lacks native optimization for non-English clinical texts.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>John Snow Labs Clinical Models</strong></td>
+                        <td>Enterprise Clinical Tuning</td>
+                        <td>Advanced Entity Extraction (NER), de-identification, mapping terms to clinical ontologies (SNOMED, ICD-10).</td>
+                        <td>Robust support and optimization, but subject to specific commercial licensing terms depending on usage.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Decision Matrix: How to Choose Your Base Model</h3>
+            <p>Choosing between a general-purpose model (Qwen 3, Llama 4) and a specialized medical model (Meditron, BioMistral) depends on your specific requirements:</p>
+            <ul>
+                <li><strong>Choose Qwen 3</strong> if your data is primarily in Portuguese (PT-BR) or other non-English languages. Its high-density multilingual tokenizer saves 30-40% context space, lowering GPU memory and training costs.</li>
+                <li><strong>Choose DeepSeek V4 / Llama 4</strong> if you need massive context length (up to 1M or 10M tokens) for parsing whole patient charts/histories, or if you need extremely strong reasoning for complex diagnostic rules.</li>
+                <li><strong>Choose Meditron / BioMistral</strong> if your system requires deep, evidence-based medical Q&A or parsing complex scientific literature (in English), and you cannot afford the model hallucinating basic clinical facts.</li>
+                <li><strong>Choose MedGemma</strong> if you are building multimodal pipelines (e.g. interpreting a radiology report alongside the chest X-ray image) on private local servers.</li>
+                <li><strong>Choose John Snow Labs</strong> if your application requires enterprise-grade compliance, HIPAA-friendly deployments, and out-of-the-box mappings to clinical codes.</li>
+            </ul>
+
+            <p><strong>Crucial Takeaway:</strong> For Portuguese (PT-BR) fine-tuning, models with larger, natively multilingual vocabularies (like <strong>Qwen 3</strong>) require <strong>30-40% fewer tokens</strong> to represent the same text compared to Llama 4, leading to faster training and lower VRAM usage!</p>
         </section>
 
         <section class="section-card">
@@ -401,12 +450,12 @@
 
         <section class="section-card quiz-container" id="quiz">
             <h2>Interactive Checkpoint</h2>
-            <div class="quiz-question">Why does Qwen 2/2.5 or DeepSeek generally run faster and use less memory than Llama 3 during Portuguese (PT-BR) fine-tuning?</div>
+            <div class="quiz-question">Why does Qwen 3 or DeepSeek generally run faster and use less memory than Llama 4 during Portuguese (PT-BR) fine-tuning?</div>
             <div class="quiz-options">
                 <div class="quiz-option" onclick="checkAnswer(this, true, 'Correct! Tokenizers not optimized for a language break words into tiny subwords or character segments, increasing token counts. A multilingual vocabulary tokenizer (like Qwen\'s 151k) maps complete Portuguese words into single tokens, reducing context load by 30-40%.')">
                     A) They have larger, multilingual vocabularies that prevent subword fragmentation in Portuguese.
                 </div>
-                <div class="quiz-option" onclick="checkAnswer(this, false, 'No, Qwen and Llama 3 use similar transformer layers and attention types. The difference is vocabulary-based.')">
+                <div class="quiz-option" onclick="checkAnswer(this, false, 'No, Qwen and Llama 4 use similar transformer layers and attention types. The difference is vocabulary-based.')">
                     B) They use a completely different form of GPU memory management that doesn\'t require CUDA.
                 </div>
                 <div class="quiz-option" onclick="checkAnswer(this, false, 'No, Qwen is trained on standard float formats like bfloat16 just like Llama.')">
